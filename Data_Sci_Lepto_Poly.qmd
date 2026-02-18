@@ -141,7 +141,7 @@ ggplot() +
 
 ```
 
-##Lets remove noise from 'pop 0' singelton observation
+## Lets remove noise from 'pop 0' singelton observation
 
 ```{r}
 # Remove noise points (population_id == 0)
@@ -177,9 +177,25 @@ ggplot() +
 
 ------------------------------------------------------------------------
 
-##Finish and Save
+## Finish and Save
 
 ```{r}
 # Save to new CSV
 write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 ```
+
+------------------------------------------------------------------------
+
+# Curating Data
+
+------------------------------------------------------------------------
+
+### Now that we have our data set, we need to mark iNat observations based on flower color
+
+Lets make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_metadata.csv, and add some new columns: **polymorphic** and **color**
+
+```{r}
+## add code to do that here
+```
+
+Next, we will go through each iNat observation in our LMini_iNat_Pops_filtered_metadata.csv by clicking the hyperlink in each respective row. Then we will note the flower color in the observation's photo, choosing pink or white, and writing that down in the color column for each respective row. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with polymorphic observations receiving a 1 and monomorphic observations receiving a 0.
