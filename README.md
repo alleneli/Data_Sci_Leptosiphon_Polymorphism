@@ -1,0 +1,185 @@
+---
+title: "Lepto_iNat_Pops"
+format: gfm
+
+execute:
+  warning: false
+---
+
+------------------------------------------------------------------------
+
+## Set up Working Directory and Install/Library Packages
+
+```{r}
+#install.packages("dbscan")
+#install.packages("sf")
+#install.packages(("ggspatial"))
+#install.packages("rnaturalearthdata")
+library(dbscan)
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(ggspatial)
+library(rnaturalearth)
+```
+
+------------------------------------------------------------------------
+
+# *Leptosiphon minimus*
+
+------------------------------------------------------------------------
+
+## Read in CSV from iNat (*Leptosiphon minimus*)
+
+```{r}
+#Read in CSV
+LM <- read.csv("data/LMini_iNat.csv")
+
+#Check out names of columns
+names(LM)
+```
+
+------------------------------------------------------------------------
+
+## Convert from Degrees to Meters, set up Pops
+
+```{r}
+#Convert to sf object
+LM_sf <- st_as_sf(LM, coords = c("longitude", "latitude"), crs = 4326)
+
+#Project to meters
+LM_utm <- st_transform(LM_sf, 32611)  # change UTM zone if needed
+LM_coords <- st_coordinates(LM_utm)
+```
+
+------------------------------------------------------------------------
+
+## Run dbscan and add Pops column to CSV
+
+```{r}
+#Run DBSCAN, 1000 m radius populations with 4 or more observations per pop
+db <- dbscan(LM_coords, eps = 1000, minPts = 4)  
+
+#Add population column
+LM$population_id <- db$cluster
+
+```
+
+------------------------------------------------------------------------
+
+## Check if it worked
+
+```{r}
+table(LM$population_id)
+sum(LM$population_id == 0)
+
+```
+
+------------------------------------------------------------------------
+
+## Save CSV
+
+```{r}
+write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Visualize data
+
+### NOTE: All observations beloning to population '0' are singelton observations, that did not meet our population criteria (4 obs within 1000 m)
+
+```{r}
+#List pop sizes
+LM_pop_sizes <- LM %>%
+  count(population_id, name = "n_obs") %>%
+  arrange(desc(n_obs))
+
+LM_pop_sizes
+
+#Bar plot of pop sizes
+ggplot(LM_pop_sizes, aes(x = factor(population_id), y = n_obs)) +
+  geom_col() +
+  labs(x = "Population ID",
+       y = "Number of Observations",
+       title = "L. minimus Observation Counts per Population") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5))
+
+
+```
+
+------------------------------------------------------------------------
+
+## Visualize pops on a map
+
+```{r}
+# Get world basemap
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Bounding box around our data
+bbox <- c(
+  xmin = min(LM$longitude) - 0.5,
+  xmax = max(LM$longitude) + 0.5,
+  ymin = min(LM$latitude) - 0.5,
+  ymax = max(LM$latitude) + 0.5
+)
+
+# Plot
+ggplot() +
+  geom_sf(data = world, fill = "gray95", color = "gray80") +
+  geom_point(data = LM,
+             aes(x = longitude, y = latitude,
+                 color = factor(population_id)),
+             size = 2, alpha = 0.85) +
+  coord_sf(xlim = c(bbox["xmin"], bbox["xmax"]),
+           ylim = c(bbox["ymin"], bbox["ymax"]),
+           expand = FALSE) +
+  labs(color = "Population") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5))
+
+```
+
+##Lets remove noise from 'pop 0' singelton observation
+
+```{r}
+# Remove noise points (population_id == 0)
+LM_clean <- LM %>%
+  filter(population_id != 0)
+
+# Quick check
+table(LM_clean$population_id)
+
+# Bounding box around our data
+bbox <- c(
+  xmin = min(LM_clean$longitude) - 0.5,
+  xmax = max(LM_clean$longitude) + 0.5,
+  ymin = min(LM_clean$latitude) - 0.5,
+  ymax = max(LM_clean$latitude) + 0.5
+)
+
+#Plot cleaned data
+ggplot() +
+  geom_sf(data = world, fill = "gray95", color = "gray80") +
+  geom_point(data = LM_clean,
+             aes(x = longitude, y = latitude,
+                 color = factor(population_id)),
+             size = 2, alpha = 0.85) +
+  coord_sf(xlim = c(bbox["xmin"], bbox["xmax"]),
+           ylim = c(bbox["ymin"], bbox["ymax"]),
+           expand = FALSE) +
+  labs(color = "Population") +
+  theme_minimal() +
+   theme(axis.text.x = element_text(size = 5))
+
+```
+
+------------------------------------------------------------------------
+
+##Finish and Save
+
+```{r}
+# Save to new CSV
+write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
+```
