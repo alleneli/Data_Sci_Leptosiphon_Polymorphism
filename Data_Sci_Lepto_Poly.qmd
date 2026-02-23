@@ -293,7 +293,7 @@ ggplot() +
     data = pop_pies,
     aes(x = longitude, y = latitude),
     cols = c("white", "pink"),
-    pie_scale = 0.6,
+    pie_scale = 1.5,
     color = "black"
   ) +
   coord_sf(
@@ -347,29 +347,6 @@ ggplot() +
 
 
 
-```
-
-```{r}
-#install.packages("prettymapr")
-library(prettymapr)
-library(ggspatial)
-
-ggplot() +
-  annotation_map_tile(type = "esri") +
-  geom_scatterpie(
-    data = pop_pies,
-    aes(x = longitude, y = latitude),
-    cols = c("white", "pink"),
-    pie_scale = 0.6,
-    color = "black"
-  ) +
-  coord_sf(crs = 3857) +
-  scale_fill_manual(
-    values = c(white = "white", pink = "#d81b60"),
-    name = "Flower color"
-  ) +
-  theme_minimal() +
-  theme(panel.grid = element_blank())
 ```
 
 \
