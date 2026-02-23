@@ -224,7 +224,6 @@ LMCF <- LMC %>%
 
 ```{r}
 #Combine remaining color columns into one column and remove empty rows
-
 LMCF_clean <- LMCF %>%
   pivot_longer(
     cols = starts_with("color"),
@@ -243,20 +242,7 @@ LMCF_clean <- LMCF %>%
 ## Group colors by population
 
 ```{r}
-pop_colors <- LMCF_clean %>%
-  group_by(population_id, latitude, longitude, color) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  group_by(population_id) %>%
-  mutate(prop = n / sum(n))
-
-pop_pies <- pop_colors %>%
-  select(population_id, latitude, longitude, color, n) %>%
-  pivot_wider(
-    names_from = color,
-    values_from = n,
-    values_fill = 0
-  )
-
+#Grouping colors by population for pie charts
 pop_pies <- LMCF_clean %>%
   group_by(population_id) %>%
   summarise(
@@ -269,30 +255,9 @@ pop_pies <- LMCF_clean %>%
   )
 ```
 
-```{r}
-pop_pies <- pop_colors %>%
-  select(population_id, latitude, longitude, color, n) %>%
-  pivot_wider(
-    names_from = color,
-    values_from = n,
-    values_fill = 0
-  )
-```
+------------------------------------------------------------------------
 
-```{r}
-pop_pies <- LMCF_clean %>%
-  group_by(population_id) %>%
-  summarise(
-    latitude  = mean(latitude),
-    longitude = mean(longitude),
-    white = sum(color == "white"),
-    pink  = sum(color == "pink"),
-    total_n = n(),
-    .groups = "drop"
-  )
-```
-
-\
+## Mapping populations as pie charts
 
 ```{r}
 # World basemap
@@ -326,47 +291,6 @@ ggplot() +
     name = "Flower color"
   ) +
   theme_minimal()
-```
-
-```{r}
-library(ggplot2)
-library(scatterpie)
-
-land <- ne_countries(
-  scale = "medium",
-  returnclass = "sf"
-)
-
-ggplot() +
-  geom_sf(
-    data = land,
-    fill = "grey95",
-    color = "grey70",
-    linewidth = 0.2
-  ) +
-  geom_scatterpie(
-    data = pop_pies,
-    aes(x = longitude, y = latitude),
-    cols = c("white", "pink"),
-    pie_scale = 0.6,
-    color = "black"
-  ) +
-  coord_sf(
-    xlim = range(pop_pies$longitude) + c(-0.2, 0.2),
-    ylim = range(pop_pies$latitude) + c(-0.2, 0.2),
-    expand = FALSE
-  ) +
-  scale_x_continuous(n.breaks = 4) +
-  scale_y_continuous(n.breaks = 4) +
-  scale_fill_manual(
-    values = c(white = "white", pink = "#d81b60"),
-    name = "Flower color"
-  ) +
-  theme_minimal()
-
-
-
-
 ```
 
 \
