@@ -222,10 +222,9 @@ LMCF <- LMC %>%
   filter(!(color1 == "closed" & color2 == "closed"))
 ```
 
-\
-\
-
 ```{r}
+#Combine remaining color columns into one column and remove empty rows
+
 LMCF_clean <- LMCF %>%
   pivot_longer(
     cols = starts_with("color"),
@@ -239,12 +238,35 @@ LMCF_clean <- LMCF %>%
   )
 ```
 
+------------------------------------------------------------------------
+
+## Group colors by population
+
 ```{r}
 pop_colors <- LMCF_clean %>%
   group_by(population_id, latitude, longitude, color) %>%
   summarise(n = n(), .groups = "drop") %>%
   group_by(population_id) %>%
   mutate(prop = n / sum(n))
+
+pop_pies <- pop_colors %>%
+  select(population_id, latitude, longitude, color, n) %>%
+  pivot_wider(
+    names_from = color,
+    values_from = n,
+    values_fill = 0
+  )
+
+pop_pies <- LMCF_clean %>%
+  group_by(population_id) %>%
+  summarise(
+    latitude  = mean(latitude),
+    longitude = mean(longitude),
+    white = sum(color == "white"),
+    pink  = sum(color == "pink"),
+    total_n = n(),
+    .groups = "drop"
+  )
 ```
 
 ```{r}
@@ -256,8 +278,6 @@ pop_pies <- pop_colors %>%
     values_fill = 0
   )
 ```
-
-\
 
 ```{r}
 pop_pies <- LMCF_clean %>%
