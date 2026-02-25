@@ -1,5 +1,5 @@
 # Background
-This README is dedicated to the 2026 BIOE 276 group project by Eli Allen, Anik Grearson, and Mikaela Salvador.
+This repository is dedicated to the 2026 BIOE 276 group project by Eli Allen, Anik Grearson, and Mikaela Salvador.
 
 ## Introduction 
 Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers.<sup>1</sup> These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.<sup>2</sup>
@@ -26,7 +26,7 @@ Sources:
 
 ## Metadata
 
-Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` contains the following columns:
+Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after step 2 (Curating  contains the following columns:
 
 - scientific name for the species observed (i.e., *Leptosiphon minimus*)
 - url and hyperlink columns linking to the iNaturalist observation
@@ -229,19 +229,31 @@ write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 
 # Curating Data
 
-------------------------------------------------------------------------
+Now that we have our data set, we need to mark our iNaturalist observations based on flower color.
 
-### Now that we have our data set, we need to mark iNat observations based on flower color
-
-Lets make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_curated.csv, and add some new columns: **polymorphic** and **color**
+## Let's make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_curated.csv, and add some new columns: **polymorphic** and **color**
 
 ```{r}
-## add code to do that here
+# Read in the csv file from Step 1
+LMini_pops_fil <- read.csv("LMini_iNat_Pops_filtered.csv", header = TRUE)
+
+# Let's create new blank columns called polymorphic and color
+# Set it to NA for numerical/logical data
+LMini_pops_fil$polymorphic <- NA
+LMini_pops_fil$color <- NA
+
+# Save the CSV
+write.csv(LMini_pops_fil, "LMini_iNat_Pops_filtered_curated.csv", row.names = FALSE)
 ```
+------------------------------------------------------------------------
 
-Next, we will go through each iNat observation in our LMini_iNat_Pops_filtered_metadata.csv by clicking the hyperlink in each respective row. Then we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.**
+## Identify color and degree of polymorphism for each iNaturalist Observation
 
-Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it as a CSV after editing.
+Next, we will go through each iNaturalist observation in our LMini_iNat_Pops_filtered_curated.csv by clicking the hyperlink in each respective row.
+
+Then, we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.**
+
+Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it to the same CSV ```LMini_iNat_Pops_filtered_curated.csv```after editing.
 
 ------------------------------------------------------------------------
 
