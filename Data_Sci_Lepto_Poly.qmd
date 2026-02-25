@@ -18,6 +18,7 @@ execute:
 #install.packages("scatterpie")
 #install.packages("rnaturalearth")
 #install.packages("sf")
+#install.packages("tmap")
 
 library(scatterpie)
 library(dbscan)
@@ -27,6 +28,8 @@ library(tidyr)
 library(ggplot2)
 library(ggspatial)
 library(rnaturalearth)
+library(tmap) # To visualize shoreline shape files
+
 ```
 
 \
@@ -293,4 +296,28 @@ ggplot() +
   theme_minimal()
 ```
 
-\
+## Mapping distance from shore
+
+In order to calculate the distance of each observation from the water (i.e., to the closest shore), we will compute the minimum distance from each observation (point) to the shoreline using vectors from the NOAA National Shoreline CUSP (West region) dataset. We downloaded the West region shape file from the NOAA portal (<https://nsde.ngs.noaa.gov/>), and imported this into R. **Note: This only works for observations in the US, so we have to manually calculate the distance from shore for the Canadian observations (population 1) using Avenza.**
+
+```{r}
+
+# Import shape file of Western US shoreline
+shoreline <- st_read("West.shp")
+
+# To view the imported shape file
+tmap_mode("view")  # interactive mode
+tm_shape(shoreline) + tm_lines()
+
+# Import coordinate data for observations
+points_sf <- st_as_sf(LMCF_clean,
+                      coords = c("longitude", "latitude"),
+                      crs = 4326)
+
+# Project to a suitable projection
+shoreline_proj <- st_transform(shoreline, 32610) # UTM 10N
+points_proj    <- st_transform(points_sf, 32610)
+
+# Compute minimum distances to shore - add new column called dist_m
+LMCF_clean$dist_m <- apply(st_distance(points_proj, shoreline_proj), 1, min)
+```
