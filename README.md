@@ -1,4 +1,4 @@
-#Background
+# Background
 This README is dedicated to the 2026 BIOE 276 group project by Eli Allen, Anik Grearson, and Mikaela Salvador.
 
 ### Introduction 
