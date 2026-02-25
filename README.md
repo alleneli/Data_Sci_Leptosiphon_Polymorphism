@@ -26,7 +26,7 @@ Sources:
 
 ## Metadata
 
-Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after step 2 (Curating  contains the following columns:
+Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after step 2 (Curating Data) and contains the following columns:
 
 - scientific name for the species observed (i.e., *Leptosiphon minimus*)
 - url and hyperlink columns linking to the iNaturalist observation
