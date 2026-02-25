@@ -10,7 +10,7 @@ In our project, we are interested in assessing if certain abiotic stressors, spe
 
 Sources: 
 
-<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. *International Journal of Molecular Sciences*, *21*(18), 6537.[https://doi.org/10.3390/ijms21186537](https://doi.org/10.3390/ijms21186537)
+<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. *International Journal of Molecular Sciences*, *21*(18), 6537. [https://doi.org/10.3390/ijms21186537](https://doi.org/10.3390/ijms21186537)
 
 <sup>2</sup>Grossenbacher *et al.* (2025). Soil and climate contribute to maintenance of a flower color polymorphism. *American Journal of Botany*, e70018. [https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
 
