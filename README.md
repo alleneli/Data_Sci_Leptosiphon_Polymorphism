@@ -8,8 +8,22 @@ Anthocyanins are a group of pigments that contribute to petal color intensity ac
 
 In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flower color for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
 
+Sources: 
 <sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. (https://doi.org/10.3390/ijms21186537)[https://doi.org/10.3390/ijms21186537]
+
 <sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism.[https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
+
+### Research Question
+
+> Are pink flowers of *Leptosiphon minimus* with elevated anthocyanins more likely to occur closer to the shoreline?
+
+### Hypothesis
+
+> Soils closer to the shoreline have higher salinity, exposing *Leptosiphon minimus* to higher levels of stress, resulting in higher expression of anthocyanins (i.e., pink pigment).
+
+### Target Audience
+
+### Metadata
 
 ------------------------------------------------------------------------
 
