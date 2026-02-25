@@ -1,7 +1,7 @@
 # Background
 This README is dedicated to the 2026 BIOE 276 group project by Eli Allen, Anik Grearson, and Mikaela Salvador.
 
-### Introduction 
+## Introduction 
 Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers.<sup>1</sup> These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.<sup>2</sup>
 
 *Leptosiphon minimus* is a native plant species that occurs across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two or more petal colors, such as pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment. 
@@ -9,25 +9,37 @@ Anthocyanins are a group of pigments that contribute to petal color intensity ac
 In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flower color for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
 
 Sources: 
+
 <sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. (https://doi.org/10.3390/ijms21186537)[https://doi.org/10.3390/ijms21186537]
 
 <sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism.[https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
 
-### Research Question
+## Research Question
 
 > Are pink flowers of *Leptosiphon minimus* with elevated anthocyanins more likely to occur closer to the shoreline?
 
-### Hypothesis
+## Hypothesis
 
 > Soils closer to the shoreline have higher salinity, exposing *Leptosiphon minimus* to higher levels of stress, resulting in higher expression of anthocyanins (i.e., pink pigment).
 
-### Target Audience
+## Target Audience
 
-### Metadata
+## Metadata
+
+Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` contains the following columns:
+
+- scientific name for the species observed (i.e., *Leptosiphon minimus*)
+- url and hyperlink columns linking to the iNaturalist observation
+- latitude and longitude coordinates for the observation
+- population identified (1, 2, 3, 4, or 5)
+- presence of polymorphism (0 for monomorphic, 1 for polymorphic, closed for unidentifiable)
+- flower color (pink or white)
 
 ------------------------------------------------------------------------
 
-## Set up Working Directory and Install/Library Packages
+# Necessary Packages
+
+## Install and load necessary R Packages
 
 ```{r}
 #install.packages("dbscan")
@@ -48,13 +60,11 @@ library(ggspatial)
 library(rnaturalearth)
 ```
 
-\
-
 ------------------------------------------------------------------------
+<details><summary>1. Data Wrangling and Visualization to Define *Leptosiphon minimus* Populations</summary>
+<p> 
 
-# *Leptosiphon minimus*
-
-------------------------------------------------------------------------
+In this section, we will use the dbscan package to define populations of *L.minimus* from iNaturalist observations. We will define populations as groups of 4 or more observations within a 1000 m radius. 
 
 ## Read in CSV from iNat (*Leptosiphon minimus*)
 
@@ -114,7 +124,7 @@ write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
 
 ## Visualize data
 
-### NOTE: All observations beloning to population '0' are singelton observations, that did not meet our population criteria (4 obs within 1000 m)
+### NOTE: All observations beloning to population '0' are singleon observations, that did not meet our population criteria (4 obs within 1000 m)
 
 ```{r}
 #List pop sizes
@@ -168,7 +178,7 @@ ggplot() +
 
 ```
 
-## Lets remove noise from 'pop 0' singelton observation
+## Let's remove noise from 'pop 0' singleton observation
 
 ```{r}
 # Remove noise points (population_id == 0)
@@ -211,7 +221,11 @@ ggplot() +
 write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 ```
 
-------------------------------------------------------------------------
+</p>
+</details>
+
+<details><summary>2. Curating Data to Identify Flower Color of *Leptosiphon minimus* Populations</summary>
+<p> 
 
 # Curating Data
 
@@ -227,7 +241,7 @@ Lets make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered
 
 Next, we will go through each iNat observation in our LMini_iNat_Pops_filtered_metadata.csv by clicking the hyperlink in each respective row. Then we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.**
 
-Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it as a CSV after editing.\
+Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it as a CSV after editing.
 
 ------------------------------------------------------------------------
 
@@ -311,5 +325,5 @@ ggplot() +
   ) +
   theme_minimal()
 ```
-
-\
+</p>
+</details>
