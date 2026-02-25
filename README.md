@@ -4,7 +4,7 @@ This repository is dedicated to the 2026 BIOE 276 group project by Eli Allen, An
 ## Introduction 
 Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers.<sup>1</sup> These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.<sup>2</sup>
 
-*Leptosiphon minimus* is a native plant species that occurs across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two or more petal colors, such as pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment. 
+*Leptosiphon minimus* is a native plant species that occurs across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two petal colors, pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment. 
 
 In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flower color for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
 
@@ -36,6 +36,8 @@ Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after s
 - flower color (pink or white)
 
 ------------------------------------------------------------------------
+
+# Data Wrangling
 
 <details><summary>0. Setup of R Packages</summary>
 <p>
