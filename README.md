@@ -24,6 +24,9 @@ Sources:
 
 ## Target Audience
 
+Our target audience for this study is for other scientists within the field of Ecology and Evolutionary Biology, specifically botanists, plant ecologists, and evolutionary biologists. 
+
+
 ## Metadata
 
 Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after step 2 (Curating Data) and contains the following columns:
