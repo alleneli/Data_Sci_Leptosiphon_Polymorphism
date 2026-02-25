@@ -1,10 +1,15 @@
----
-title: "Lepto_iNat_Pops"
-format: gfm
+#Background
+This README is dedicated to the 2026 BIOE 276 group project by Eli Allen, Anik Grearson, and Mikaela Salvador.
 
-execute:
-  warning: false
----
+### Introduction 
+Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers.<sup>1</sup> These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.<sup>2</sup>
+
+*Leptosiphon minimus* is a native plant species that occurs across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two or more petal colors, such as pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment. 
+
+In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flower color for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
+
+<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. (https://doi.org/10.3390/ijms21186537)[https://doi.org/10.3390/ijms21186537]
+<sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism.[https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
 
 ------------------------------------------------------------------------
 
