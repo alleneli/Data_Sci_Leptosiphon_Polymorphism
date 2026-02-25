@@ -6,13 +6,13 @@ Anthocyanins are a group of pigments that contribute to petal color intensity ac
 
 *Leptosiphon minimus* is a native plant species that occurs across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two petal colors, pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment. 
 
-In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flower color for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
+In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flowers for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the pink vs. white color morphs of *L. minimus* and define different populations. We will also use distance to shoreline as a proxy for soil salinity.
 
 Sources: 
 
-<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. [https://doi.org/10.3390/ijms21186537](https://doi.org/10.3390/ijms21186537)
+<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. *International Journal of Molecular Sciences*, *21*(18), 6537.[https://doi.org/10.3390/ijms21186537](https://doi.org/10.3390/ijms21186537)
 
-<sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism. [https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
+<sup>2</sup>Grossenbacher *et al.* (2025). Soil and climate contribute to maintenance of a flower color polymorphism. *American Journal of Botany*, e70018. [https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
 
 ## Research Question
 
