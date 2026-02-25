@@ -20,7 +20,7 @@ Sources:
 
 ## Hypothesis
 
-> Soils closer to the shoreline have higher salinity, exposing *Leptosiphon minimus* to higher levels of stress, resulting in higher expression of anthocyanins (i.e., pink pigment).
+> Soils closer to the shoreline have higher salinity, exposing *Leptosiphon minimus* to higher levels of abiotic stress, which will result in elevated levels of anthocyanins (i.e., pink pigment).
 
 ## Target Audience
 
