@@ -10,9 +10,9 @@ In our project, we are interested in assessing if certain abiotic stressors, spe
 
 Sources: 
 
-<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. (https://doi.org/10.3390/ijms21186537)[https://doi.org/10.3390/ijms21186537]
+<sup>1</sup>Mekapogu *et al.* (2025). Anthocyanins in Floral Colors: Biosynthesis and Regulation in Chrysanthemum Flowers. [https://doi.org/10.3390/ijms21186537](https://doi.org/10.3390/ijms21186537)
 
-<sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism.[https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
+<sup>2</sup>Grossenbacher *et al.* (2025).Soil and climate contribute to maintenance of a flower color polymorphism. [https://doi.org/10.1002/ajb2.70018](https://doi.org/10.1002/ajb2.70018)
 
 ## Research Question
 
@@ -37,7 +37,8 @@ Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after s
 
 ------------------------------------------------------------------------
 
-# Necessary Packages
+<details><summary>0. Setup of R Packages</summary>
+<p>
 
 ## Install and load necessary R Packages
 
@@ -59,6 +60,8 @@ library(ggplot2)
 library(ggspatial)
 library(rnaturalearth)
 ```
+</p>
+</details>
 
 ------------------------------------------------------------------------
 <details><summary>1. Data Wrangling and Visualization to Define *Leptosiphon minimus* Populations</summary>
@@ -223,6 +226,8 @@ write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 
 </p>
 </details>
+
+------------------------------------------------------------------------
 
 <details><summary>2. Curating Data to Identify Flower Color of *Leptosiphon minimus* Populations</summary>
 <p> 
