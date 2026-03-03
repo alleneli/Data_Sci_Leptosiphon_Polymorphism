@@ -29,6 +29,8 @@ library(ggplot2)
 library(ggspatial)
 library(rnaturalearth)
 library(tmap) # To visualize shoreline shape files
+library(brms)
+library(ggeffects)
 
 ```
 
@@ -313,7 +315,7 @@ In order to calculate the distance of each observation from the water (i.e., to 
 ```{r}
 
 # Import shape file of Western US shoreline
-shoreline <- st_read("West.shp")
+shoreline <- st_read("data/West/West.shp")
 
 # To view the imported shape file
 tmap_mode("view")  # interactive mode
@@ -330,4 +332,61 @@ points_proj    <- st_transform(points_sf, 32610)
 
 # Compute minimum distances to shore - add new column called dist_m
 LMCF_clean$dist_m <- apply(st_distance(points_proj, shoreline_proj), 1, min)
+
+# Manually overwrite data for observations in Canada (Population 1)
+LMCF_clean$dist_m[6] <- 200 # Observation 121793064
+LMCF_clean$dist_m[7] <- 210 # Observation 121793096
+LMCF_clean$dist_m[8] <- 190 # Observation 121793133
+
+# Change pink to 1 and white to 0, add a new column called color_binom
+LMCF_clean <- LMCF_clean %>%
+  mutate(color_binom = case_when(
+    color == "pink"  ~ 1,
+    color == "white" ~ 0,
+    TRUE ~ NA_real_
+  ))
+
+# Write to csv
+write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Mapping distance from shore
+
+```{r}
+# Change color to a factor - will default 
+#LCMF_clean$color <- as.factor(LCMF_clean$color$)
+
+# Plot 
+ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
+  geom_point() +
+  theme_bw()
+
+# Run the model
+m.dist.color.pop <-
+  brm(data = LMCF_clean, # Give the model the data
+      # Use a binomial distribution
+      family = bernoulli(link = "logit"),
+      # Specify the model 
+      color_binom ~ 1 + dist_m + (1|population_id),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      file = "output/m.dist.color.pop")
+
+print(m.dist.color.pop, digits = 3)
+plot(m.dist.color.pop)
+```
+
+```{r}
+#  Extract all posteriors from 4 MCMC chains into a table
+draws <- as_draws_df(m.dist.color.pop) 
+
+# What proportion of posteriors have estimate for slope > 0?
+sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
+```
+
+```{r}
+# Plot predicted response
+preds <- predict_response(m.dist.color.pop)
+plot(preds)
 ```
