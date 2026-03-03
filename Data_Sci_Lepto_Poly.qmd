@@ -203,15 +203,25 @@ write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 
 ### Now that we have our data set, we need to mark iNat observations based on flower color
 
-Lets make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_curated.csv, and add some new columns: **polymorphic** and **color**
+Lets make a copy of **LMini_iNat_Pops_filtered.csv** called **LMini_iNat_Pops_filtered_curated.csv**, and add some new columns: **polymorphic** and **color1** and **color2**.
 
 ```{r}
-## add code to do that here
+LMini_iNat_Pops_filtered = read.csv("data/LMini_iNat_Pops_filtered.csv")
+LMini_iNat_Pops_filtered_curated <- LMini_iNat_Pops_filtered %>%
+  mutate(
+    polymorphic = NA,
+    color1 = NA_character_,
+    color2 = NA_character_
+  )
+
+write.csv(LMini_iNat_Pops_filtered_curated,
+          "data/LMini_iNat_Pops_filtered_curated.csv",
+          row.names = FALSE)
 ```
 
-Next, we will go through each iNat observation in our LMini_iNat_Pops_filtered_metadata.csv by clicking the hyperlink in each respective row. Then we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.**
+Next, we will go through each iNat observation in our LMini_iNat_Pops_filtered_curated.csv by clicking the hyperlink in each respective row. Then we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.** If the observation is polymorphic, it's second color will be put into the color2 column.
 
-Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it as a CSV after editing.\
+Once the **polymorphic** and **color** columns are filled out we can move on to the next step; lets save the new file as **LMini_iNat_Pops_filtered_curated_color.csv** Make sure to save it as a CSV after editing.\
 
 ------------------------------------------------------------------------
 
@@ -219,7 +229,7 @@ Once the **polymorphic** and **color** columns are filled out we can move on to 
 
 ```{r}
 #Read in curated CSV 
-LMC <- read.csv("data/LMini_iNat_Pops_filtered_curated.csv")
+LMC <- read.csv("data/LMini_iNat_Pops_filtered_curated_color.csv")
 
 LMCF <- LMC %>%
   filter(!(color1 == "closed" & color2 == "closed"))
