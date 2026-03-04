@@ -421,9 +421,8 @@ write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
 
 Since we are interested in if shoreline distance predicts the outcome of flower color (pink or white), we will be using a Bernoulli distribution to model our data. We will use individual populations (i.e., 1, 2, 3, 4, 5, 6) as a random effect since it will contribute to clustering in our data. We will be using the brm() within the ```brms``` R package for our model. 
 
-------------------------------------------------------------------------
-
-## Making a ggplot for Our Potential Model 
+<details><summary>0. Making a ggplot for Our Potential Model </summary>
+<p> 
 
 ```{r}
 # Change color to a factor - will default 
@@ -435,10 +434,11 @@ ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
   theme_bw()
 
 ```
+</p>
+</details>
 
-------------------------------------------------------------------------
-
-## Running and Assessing the Model using brms()
+<details><summary>1.  Running and Assessing the Model using brms() </summary>
+<p> 
 
 ```
 # Run the model
@@ -454,10 +454,11 @@ m.dist.color.pop <-
 print(m.dist.color.pop, digits = 3)
 plot(m.dist.color.pop)
 ```
+</p>
+</details>
 
-------------------------------------------------------------------------
-
-## Estimate the probability that pink increases closer to shore 
+<details><summary>2.  Estimate the probability that pink increases closer to shore </summary>
+<p> 
 
 ```{r}
 #  Extract all posteriors from 4 MCMC chains into a table
@@ -466,13 +467,16 @@ draws <- as_draws_df(m.dist.color.pop)
 # What proportion of posteriors have estimate for slope > 0?
 sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
 ```
+</p>
+</details>
 
-------------------------------------------------------------------------
-
-## Plotting the Model's Predicted Response 
+<details><summary>3.  Plotting the Model's Predicted Response  </summary>
+<p> 
 
 ```{r}
 # Plot predicted response
 preds <- predict_response(m.dist.color.pop)
 plot(preds)
 ```
+</p>
+</details>
