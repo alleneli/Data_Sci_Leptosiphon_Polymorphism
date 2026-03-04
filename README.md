@@ -26,6 +26,20 @@ Sources:
 
 Our target audience for this study is for other scientists within the field of Ecology and Evolutionary Biology, specifically botanists, plant ecologists, and evolutionary biologists. 
 
+## Repositories
+We have two sub-repositories: ```data``` and ```output```. 
+
+```data``` contains the following files: 
+- LMini_iNat.csv all raw, unfiltered iNaturalist observations of *Leptosiphon minimus*
+- LMini_iNat_Pops.csv: all iNaturalist observations of *L. minimus* grouped by populations 0 - 6 
+- LMini_iNat_Pops_filtered.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, removing population 0 for a singleton observation
+- LMini_iNat_Pops_filtered_curated.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, with blank columns donating if an observation is ```polymorphic```, their primary color ```color1```, and their secondary color if applicable ```color2```
+- LMini_iNat_Pops_filtered_curated_color.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6 with filled in columns for ```polymorphic```, ```color1```, and ```color2```
+- LMini_iNat_Pops_filtered_curated_metadata.xlsx: metadata for each of our iNaturalist observations
+- LMCF_clean_dist.csv: distance to shore for each of the observations in populations 1-6, excluding population 0 and any closed observations 
+- West: West region shape file from NOAA used to calculate distance to shore
+
+```output``` contains our model output for testing if pink flower color is more likely closer to shore: m.dist.color.pop
 
 ## Metadata
 
