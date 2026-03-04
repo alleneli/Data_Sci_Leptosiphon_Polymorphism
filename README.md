@@ -457,7 +457,7 @@ plot(m.dist.color.pop)
 </p>
 </details>
 
-<details><summary>2.  Estimate the probability that pink increases closer to shore </summary>
+<details><summary>2.  Estimate and visualize the probability that pink increases closer to shore </summary>
 <p> 
 
 ```{r}
@@ -466,14 +466,7 @@ draws <- as_draws_df(m.dist.color.pop)
 
 # What proportion of posteriors have estimate for slope > 0?
 sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
-```
-</p>
-</details>
 
-<details><summary>3.  Plotting the Model's Predicted Response  </summary>
-<p> 
-
-```{r}
 # Plot predicted response
 preds <- predict_response(m.dist.color.pop)
 plot(preds)
