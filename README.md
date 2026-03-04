@@ -30,14 +30,14 @@ Our target audience for this study is for other scientists within the field of E
 We have two sub-repositories: ```data``` and ```output```. 
 
 ```data``` contains the following files: 
-- LMini_iNat.csv all raw, unfiltered iNaturalist observations of *Leptosiphon minimus*
-- LMini_iNat_Pops.csv: all iNaturalist observations of *L. minimus* grouped by populations 0 - 6 
-- LMini_iNat_Pops_filtered.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, removing population 0 for a singleton observation
-- LMini_iNat_Pops_filtered_curated.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, with blank columns donating if an observation is ```polymorphic```, their primary color ```color1```, and their secondary color if applicable ```color2```
-- LMini_iNat_Pops_filtered_curated_color.csv: iNaturalist observations of *L. minimus* grouped by populations 1 - 6 with filled in columns for ```polymorphic```, ```color1```, and ```color2```
-- LMini_iNat_Pops_filtered_curated_metadata.xlsx: metadata for each of our iNaturalist observations
-- LMCF_clean_dist.csv: distance to shore for each of the observations in populations 1-6, excluding population 0 and any closed observations 
-- West: West region shape file from NOAA used to calculate distance to shore
+- ```LMini_iNat.csv```: all raw, unfiltered iNaturalist observations of *Leptosiphon minimus*
+- ```LMini_iNat_Pops.csv```: all iNaturalist observations of *L. minimus* grouped by populations 0 - 6 
+- ```LMini_iNat_Pops_filtered.csv```: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, removing population 0 for a singleton observation
+- ```LMini_iNat_Pops_filtered_curated.csv```: iNaturalist observations of *L. minimus* grouped by populations 1 - 6, with blank columns donating if an observation is ```polymorphic```, their primary color ```color1```, and their secondary color if applicable ```color2```
+- ```LMini_iNat_Pops_filtered_curated_color.csv```: iNaturalist observations of *L. minimus* grouped by populations 1 - 6 with filled in columns for ```polymorphic```, ```color1```, and ```color2```
+- ```LMini_iNat_Pops_filtered_curated_metadata.xlsx```: metadata for each of our iNaturalist observations
+- ```LMCF_clean_dist.csv```: distance to shore for each of the observations in populations 1-6, excluding population 0 and any closed observations 
+- ```West```: West region shape file from NOAA used to calculate distance to shore
 
 ```output``` contains our model output for testing if pink flower color is more likely closer to shore: m.dist.color.pop
 
@@ -55,6 +55,8 @@ Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after s
 ------------------------------------------------------------------------
 
 # Data Curation, Wrangling, and Exploratory Visualization
+
+In the following sections, we will wrangle our data to generate our metadata sheet ```LMini_iNat_Pops_filtered_curated_metadata.xlsx``` and our final filtered datasheet ```LMCF_clean_dist.csv``` that contains individual iNaturalist observations of *L. minimus* grouped by populations, identified flower color (pink or white), and distance to shoreline. We will also produce an exploratory map, showing the proportion of pink to white flowers for each defined population as a pie chart on a map. 
 
 <details><summary>0. Setup of R Packages</summary>
 <p>
