@@ -6,9 +6,25 @@ execute:
   warning: false
 ---
 
+# Babystars and soil salinity
+
+Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers. These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.
+
+*Leptosiphon minimus* (common name: True babystars) is a native plant species found across the northwestern coast of North America in California, Oregon, Washington, and British Columbia. *L. minimus* is known for being polymorphic, exhibiting two petal colors: pink and white. Within these color morphs, elevated levels of anthocyanins produce a pink pigment.
+
+In our project, we are interested in assessing if certain abiotic stressors, specifically harsh, more saline soils, can predict the frequency of pink flowers for *L. minimus* at the population level. We will be using iNaturalist observations taken across the northwestern coast of USA and Canada to identify the pink vs. white color morphs of *L. minimus* and group them by different populations. We will also use distance to shoreline as a proxy for soil salinity.
+
+**Question:** Are *L. minimus* flowers more likely to be pink the closer they are located to the shore?
+
+**Hypothesis:** Soils closer to the sea shore have higher salinity, and increasing anthocyanin levels can help plants better withstand exposure to more saline microenvironments.
+
+**Prediction:** If anthocyanins help plants better withstand exposure to saline soils, then we predict that *L. minimus* flowers closer to the sea shore will be more likely to be pink.
+
 ------------------------------------------------------------------------
 
 ## Set up Working Directory and Install/Library Packages
+
+Let's start by loading the required packages (and installing if necessary).
 
 ```{r}
 #install.packages("dbscan")
@@ -29,20 +45,16 @@ library(ggplot2)
 library(ggspatial)
 library(rnaturalearth)
 library(tmap) # To visualize shoreline shape files
-library(brms)
-library(ggeffects)
+library(brms) # For Bayesian Statistical Modeling
+library(ggeffects) 
 
 ```
 
-\
-
 ------------------------------------------------------------------------
 
-# *Leptosiphon minimus*
+## Import data set into R
 
-------------------------------------------------------------------------
-
-## Read in CSV from iNat (*Leptosiphon minimus*)
+We have downloaded 69 observations of *Leptosiphin minimus* (babystars) from iNaturalist as a CSV file (called `Lmini_iNat.csv`). This will be our raw data, and includes the following columns: the observation ID (`id`), the URL to the observation on iNaturalist.com (`url`), latitude/longitude for the observation location (`latitude` and `longitude`) and the scientific name.
 
 ```{r}
 #Read in CSV
@@ -56,6 +68,8 @@ names(LM)
 
 ## Convert from Degrees to Meters, set up Pops
 
+In order to define populations, we will use a package called `dbscan` to group *L. minimus* observations into populations using a 1000-meter radius. Before we can do this, we must convert latitude/longitude degrees into meters.
+
 ```{r}
 #Convert to sf object
 LM_sf <- st_as_sf(LM, coords = c("longitude", "latitude"), crs = 4326)
@@ -67,7 +81,9 @@ LM_coords <- st_coordinates(LM_utm)
 
 ------------------------------------------------------------------------
 
-## Run dbscan and add Pops column to CSV
+## Run `dbscan` and add define populations
+
+Now that we've converted latitude to meters, we can run dbscan
 
 ```{r}
 #Run DBSCAN, 1000 m radius populations with 4 or more observations per pop
@@ -312,6 +328,8 @@ ggplot() +
 
 In order to calculate the distance of each observation from the water (i.e., to the closest shore), we will compute the minimum distance from each observation (point) to the shoreline using vectors from the NOAA National Shoreline CUSP (West region) dataset. We downloaded the West region shape file from the NOAA portal (<https://nsde.ngs.noaa.gov/>), and imported this into R. **Note: This only works for observations in the US, so we have to manually calculate the distance from shore for the Canadian observations (population 1) using Avenza.**
 
+This will output a data frame with
+
 ```{r}
 
 # Import shape file of Western US shoreline
@@ -348,6 +366,9 @@ LMCF_clean <- LMCF_clean %>%
 
 # Write to csv
 write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
+
+# Check headers for data frame
+str(LMCF_clean)
 ```
 
 ------------------------------------------------------------------------
