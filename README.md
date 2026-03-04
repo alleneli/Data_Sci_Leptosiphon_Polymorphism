@@ -40,7 +40,7 @@ Our metadata ```LMini_iNat_Pops_filtered_curated_metadata``` is produced after s
 
 ------------------------------------------------------------------------
 
-# Data Wrangling
+# Data Curation, Wrangling, and Exploratory Visualization
 
 <details><summary>0. Setup of R Packages</summary>
 <p>
@@ -132,7 +132,9 @@ write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
 
 ## Visualize data
 
-### NOTE: All observations beloning to population '0' are singleon observations, that did not meet our population criteria (4 obs within 1000 m)
+We will use ggplot to make a bar plot of population sizes.
+
+### NOTE: All observations belonging to population '0' are singleton observations, that did not meet our population criteria (4 observations within 1000 m)
 
 ```{r}
 #List pop sizes
@@ -157,6 +159,7 @@ ggplot(LM_pop_sizes, aes(x = factor(population_id), y = n_obs)) +
 ------------------------------------------------------------------------
 
 ## Visualize pops on a map
+We will use the sf package to visualize the proportion of pink to white flowers as pie charts on a map of our populations. 
 
 ```{r}
 # Get world basemap
@@ -349,3 +352,113 @@ ggplot() +
 ```
 </p>
 </details>
+
+<details><summary>3. Generating Shoreline Distance for Individual iNaturalist Observations </summary>
+<p>
+
+In order to calculate the distance of each observation from the water (i.e., to the closest shore), we will compute the minimum distance from each observation (point) to the shoreline using vectors from the NOAA National Shoreline CUSP (West region) dataset. We downloaded the West region shape file from the NOAA portal (<https://nsde.ngs.noaa.gov/>), and imported this into R. 
+
+**Note: This only works for observations in the US, so we had to manually calculate the distance from shore for the Canadian observations (population 1) using the app Avenza. For each of the Canadian observations, we measured the minimum distance from shore using the Draw and Measure Tool.**
+
+```{r}
+
+# Import shape file of Western US shoreline
+shoreline <- st_read("data/West/West.shp")
+
+# To view the imported shape file
+tmap_mode("view")  # interactive mode
+tm_shape(shoreline) + tm_lines()
+
+# Import coordinate data for observations
+points_sf <- st_as_sf(LMCF_clean,
+                      coords = c("longitude", "latitude"),
+                      crs = 4326)
+
+# Project to a suitable projection
+shoreline_proj <- st_transform(shoreline, 32610) # UTM 10N
+points_proj    <- st_transform(points_sf, 32610)
+
+# Compute minimum distances to shore - add new column called dist_m
+LMCF_clean$dist_m <- apply(st_distance(points_proj, shoreline_proj), 1, min)
+
+# Manually overwrite data for observations in Canada (Population 1)
+LMCF_clean$dist_m[6] <- 200 # Observation 121793064
+LMCF_clean$dist_m[7] <- 210 # Observation 121793096
+LMCF_clean$dist_m[8] <- 190 # Observation 121793133
+
+# Change pink to 1 and white to 0, add a new column called color_binom
+LMCF_clean <- LMCF_clean %>%
+  mutate(color_binom = case_when(
+    color == "pink"  ~ 1,
+    color == "white" ~ 0,
+TRUE ~ NA_real_
+  ))
+
+# Write to csv
+write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
+```
+  
+</p>
+</details>
+
+------------------------------------------------------------------------
+
+# Modeling our Data
+
+Since we are interested in if shoreline distance predicts the outcome of flower color (pink or white), we will be using a Bernoulli distribution to model our data. We will use individual populations (i.e., 1, 2, 3, 4, 5, 6) as a random effect since it will contribute to clustering in our data. We will be using the brm() within the ```brms``` R package for our model. 
+
+------------------------------------------------------------------------
+
+## Making a ggplot for Our Potential Model 
+
+```{r}
+# Change color to a factor - will default 
+#LCMF_clean$color <- as.factor(LCMF_clean$color$)
+
+# Plot 
+ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
+  geom_point() +
+  theme_bw()
+
+```
+
+------------------------------------------------------------------------
+
+## Running and Assessing the Model using brms()
+
+```
+# Run the model
+m.dist.color.pop <-
+  brm(data = LMCF_clean, # Give the model the data
+      # Use a binomial distribution
+      family = bernoulli(link = "logit"),
+      # Specify the model 
+      color_binom ~ 1 + dist_m + (1|population_id),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      file = "output/m.dist.color.pop")
+
+print(m.dist.color.pop, digits = 3)
+plot(m.dist.color.pop)
+```
+
+------------------------------------------------------------------------
+
+## Estimate the probability that pink increases closer to shore 
+
+```{r}
+#  Extract all posteriors from 4 MCMC chains into a table
+draws <- as_draws_df(m.dist.color.pop) 
+
+# What proportion of posteriors have estimate for slope > 0?
+sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
+```
+
+------------------------------------------------------------------------
+
+## Plotting the Model's Predicted Response 
+
+```{r}
+# Plot predicted response
+preds <- predict_response(m.dist.color.pop)
+plot(preds)
+```
