@@ -83,7 +83,7 @@ LM_coords <- st_coordinates(LM_utm)
 
 ## Run `dbscan` and add define populations
 
-Now that we've converted latitude to meters, we can run dbscan
+Now that we've converted latitude to meters, we can run dbscan. We will use dbscan to define populations as 4 or more observations within a 1000 m radius. 
 
 ```{r}
 #Run DBSCAN, 1000 m radius populations with 4 or more observations per pop
@@ -97,6 +97,8 @@ LM$population_id <- db$cluster
 ------------------------------------------------------------------------
 
 ## Check if it worked
+
+Let us check if we added a column for population ID. 
 
 ```{r}
 table(LM$population_id)
@@ -117,6 +119,8 @@ write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
 ## Visualize data
 
 ### NOTE: All observations beloning to population '0' are singelton observations, that did not meet our population criteria (4 obs within 1000 m)
+
+Let's count how many observations are within each of populations 0-6. 
 
 ```{r}
 #List pop sizes
@@ -373,7 +377,7 @@ str(LMCF_clean)
 
 ------------------------------------------------------------------------
 
-## Mapping distance from shore
+## Make a simple ggplot for our potential model 
 
 ```{r}
 # Change color to a factor - will default 
@@ -383,7 +387,50 @@ str(LMCF_clean)
 ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
   geom_point() +
   theme_bw()
+```
 
+
+## Run prior predictive simulations
+```{r}
+# Define priors
+priors <- c(
+  set_prior("normal(0, 1)", class = "Intercept"),        # prior for alpha (intercept)
+  set_prior("normal(0, .5)", class = "b", coef = "dist_m"), # prior for beta (slope)
+  set_prior("exponential(1)", class = "sd")                 # prior for random effect SD
+)
+
+# Run prior simulations
+n <- 1000
+
+priorsims <- tibble(
+    group = seq_len(n),
+    alpha = rnorm(n, 0, 1),   # prior for intercept (log-odds scale)
+    beta  = rnorm(n, 0, .5)      # prior for slope (effect of distance)
+  ) %>%
+  expand(
+    nesting(group, alpha, beta),
+    dist_scaled = seq(from = -2, to = 2, length.out = 100)  # range of (scaled) distance
+  ) %>%
+  mutate(
+    log_odds = alpha + beta * dist_scaled,   # linear predictor (log-odds)
+    prob      = plogis(log_odds)             # convert to probability via inverse logit
+  )
+
+# Plot prior predictive lines
+ggplot(priorsims,
+       aes(x = dist_scaled,
+           y = prob,
+           group = group)) +
+  geom_line(alpha = 0.05) +
+  labs(
+    title = "Prior Predictive Lines (Bernoulli logit)",
+    x     = "Distance to Shore (centered & scaled)",
+    y     = "P(pink flower)"
+  )
+```
+
+## Run the model with our priors
+```{r}
 # Run the model
 m.dist.color.pop <-
   brm(data = LMCF_clean, # Give the model the data
@@ -391,13 +438,28 @@ m.dist.color.pop <-
       family = bernoulli(link = "logit"),
       # Specify the model 
       color_binom ~ 1 + dist_m + (1|population_id),
+      # Set priors 
+      prior = priors, 
+      sample_prior = TRUE,
       iter = 2000, warmup = 1000, chains = 4, cores = 4,
       file = "output/m.dist.color.pop")
+```
 
+## Assess the model
+
+Let's run summary(), print(), and plot() on our model output to assess how well it ran! 
+
+The model seems to have converged correctly! Our Rhat is equal to 1. The MCMC chains are overlapping and flat, and the posterior distributions are smooth and have one clean peak. 
+
+For every 1 meter increase in distance to shore, the log-odds of being pink increases by 0.003. However, we cannot confidently state that the effect size is different from 0 because our 95% lower and upper compatibility intervals intersect 0 (-0.001 - 0.010). 
+```{r}
+summary(m.dist.color.pop)
 print(m.dist.color.pop, digits = 3)
 plot(m.dist.color.pop)
 ```
+## How often is our posterior slope larger than zero? 
 
+In this section, we will use the as_draws_df() to extract the posterior distribution samples from our fitted brms model into a data frame. Then, we will calculate a proportion of how many our sampled values of our slope are positive. 
 ```{r}
 #  Extract all posteriors from 4 MCMC chains into a table
 draws <- as_draws_df(m.dist.color.pop) 
@@ -406,8 +468,12 @@ draws <- as_draws_df(m.dist.color.pop)
 sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
 ```
 
+We have a value of .858, which means that 85.8% of the posterior distribution for the slope is above zero. This means that there is an 85.8% probability that distance to shore has a positive effect on pink flower color. In other words, flowers are more likely to be pink as distance from shore increases. 
+
+
 ```{r}
 # Plot predicted response
-preds <- predict_response(m.dist.color.pop)
+preds <- predict_response(m.dist.color.pop,
+                          bias_correction = TRUE)
 plot(preds)
 ```
