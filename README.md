@@ -84,7 +84,6 @@ library(rnaturalearth)
 </p>
 </details>
 
-------------------------------------------------------------------------
 <details><summary>1. Data Wrangling and Visualization to Define *Leptosiphon minimus* Populations</summary>
 <p> 
 
@@ -250,8 +249,6 @@ write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 
 </p>
 </details>
-
-------------------------------------------------------------------------
 
 <details><summary>2. Curating Data to Identify Flower Color of *Leptosiphon minimus* Populations</summary>
 <p> 
