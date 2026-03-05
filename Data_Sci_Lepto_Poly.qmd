@@ -391,6 +391,15 @@ ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
 
 
 ## Run prior predictive simulations
+
+In this section, we will define our priors and explore what they look like in simulations. 
+
+For our standard deviation, we will set our prior as exponential(1). This will make our standard deviation always positive and centreed near 0. 
+
+For our slope, we will set it as normal(0, 0.5). Our slope is how much the log-odds of being pink changes for every one unit increase in distance to shore. The 0 means we start with no prior expectation of a relationship, and the 0.5 means we're skeptical of very large effects. 
+
+Finally, for our intercept, we will set it as normal(0,1). The intercept is the baseline log-odds of a flower being pink when distance to shore is zero. The 0 means we expect the baseline probability to be centered around 50/50 (since plogis(0) = 0.5).
+The 1 means we allow moderate uncertainty around that, letting the baseline probability range roughly between ~18% and ~82% (plogis(-1) to plogis(1)). 
 ```{r}
 # Define priors
 priors <- c(
