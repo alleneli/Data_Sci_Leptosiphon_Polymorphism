@@ -1,12 +1,12 @@
 ---
-title: "Lepto_iNat_Pops"
+title: "Babystars and soil salinity"
 format: pdf
 
 execute:
   warning: false
 ---
 
-# Babystars and soil salinity
+# Anthocyanins in Babystars
 
 Anthocyanins are a group of pigments that contribute to petal color intensity across many species of flowers. These pigments also are important for providing tolerance to abiotic stressors, such as high UV radiation, extreme soil conditions, and low precipitation.
 
@@ -344,9 +344,9 @@ In order to calculate the distance of each observation from the water (i.e., to 
 # Import shape file of Western US shoreline
 shoreline <- st_read("data/West/West.shp")
 
-# To view the imported shape file
-tmap_mode("view")  # interactive mode
-tm_shape(shoreline) + tm_lines()
+# To view the imported shape file - Requires HTML output for saving; commented out for now
+#tmap_mode("view")  # interactive mode
+#tm_shape(shoreline) + tm_lines()
 
 # Import coordinate data for observations
 points_sf <- st_as_sf(LMCF_clean,
@@ -499,14 +499,6 @@ We have a value of .858, which means that **85.8% of the posterior distribution 
 preds <- predict_response(m.dist.color.pop,
                           bias_correction = TRUE)
 plot(preds)
-
-# Plot predicted response by population - this is a little wonky still...
-preds_pop <- predict_response(m.dist.color.pop,
-                              terms = c("dist_m", "population_id"),
-                              bias_correction = TRUE,
-                              type = "random"
-                              )
-plot(preds_pop)
 ```
 
 ## Overlay empirical binned proportions on top of model
