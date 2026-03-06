@@ -249,6 +249,9 @@ ggplot() +
    theme(axis.text.x = element_text(size = 5))
 
 ```
+<img width="546" height="457" alt="Plot3_cleaneddata_map" src="https://github.com/user-attachments/assets/21cf96a8-ffbe-4039-a628-74bd684fe09a" />
+
+
 
 ------------------------------------------------------------------------
 
@@ -386,6 +389,9 @@ ggplot() +
   ) +
   theme_minimal()
 ```
+
+<img width="532" height="395" alt="Plot4_piechart_map" src="https://github.com/user-attachments/assets/b768af2e-9977-4bd3-bfdc-e1a2f8bede3b" />
+
 </p>
 </details>
 
@@ -463,6 +469,9 @@ ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
   labs(x = "Distance from shore (m)",
        y = "Color")
 ```
+
+<img width="621" height="374" alt="Plot5_scatterplot_potentialmodel" src="https://github.com/user-attachments/assets/48db52f3-0a15-43c3-97a3-d35c0f09c45a" />
+
 </p>
 </details>
 
@@ -515,6 +524,10 @@ ggplot(priorsims,
   )
 ```
 
+<img width="702" height="402" alt="Plot6_priorsimulations" src="https://github.com/user-attachments/assets/10c06f1d-4ed9-47dc-b6f7-c8e0cff52d8d" />
+
+
+
 </p>
 </details>
 
@@ -546,10 +559,16 @@ m.dist.color.pop <-
 Let's run `summary()`, `print()`, and `plot()` on our model output to assess how well it ran!
 
 ```
+
 summary(m.dist.color.pop)
 print(m.dist.color.pop, digits = 3)
 plot(m.dist.color.pop)
+
 ```
+<img width="641" height="284" alt="Plot7_2_modeloutputsummary" src="https://github.com/user-attachments/assets/ec26570a-7dc8-464c-ba5b-9d905827009a" />
+<img width="668" height="373" alt="Plot7_modeloutput" src="https://github.com/user-attachments/assets/b46fd968-748d-4ad1-b376-c9a0cb33e90c" />
+
+
 The model seems to have converged correctly! Our Rhat is equal to 1. The MCMC chains are overlapping and flat, and the posterior distributions are smooth and have one clean peak.
 
 **For every 1 meter increase in distance to shore, the log-odds of being pink increases by 0.003**. However, we cannot confidently state that the effect size is different from 0 because our 95% lower and upper compatibility intervals intersect 0 (-0.001 - 0.010).
@@ -583,7 +602,10 @@ preds <- predict_response(m.dist.color.pop,
                           bias_correction = TRUE)
 plot(preds)
 ```
+<img width="708" height="348" alt="Plot8_predictedresponseplot" src="https://github.com/user-attachments/assets/e13834b2-4501-460f-82c0-90e00a86d730" />
+
 ------------------------------------------------------------------------
+
 
 ## Overlay empirical binned proportions on top of model
 
@@ -617,7 +639,10 @@ p + # Add binned points
              aes(x = dist_mid, y = mean_prob),
              size = 3,
              color = "black")
+
 ```
+
+<img width="796" height="437" alt="Plot9_predictedresponseplot_overlaidpoints" src="https://github.com/user-attachments/assets/f03dbfeb-05f3-49f2-891c-542342b2f03f" />
 
 </p>
 </details>
