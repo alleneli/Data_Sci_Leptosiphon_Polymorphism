@@ -61,6 +61,8 @@ In the following sections, we will wrangle our data to generate our metadata she
 <details><summary>0. Setup of R Packages</summary>
 <p>
 
+Let's start by loading the required packages (and installing if necessary).
+
 ## Install and load necessary R Packages
 
 ```{r}
@@ -80,6 +82,9 @@ library(tidyr)
 library(ggplot2)
 library(ggspatial)
 library(rnaturalearth)
+library(tmap) # To visualize shoreline shape files
+library(brms) # For Bayesian Statistical Modeling
+library(ggeffects) 
 ```
 </p>
 </details>
@@ -90,6 +95,8 @@ library(rnaturalearth)
 In this section, we will use the dbscan package to define populations of *L.minimus* from iNaturalist observations. We will define populations as groups of 4 or more observations within a 1000 m radius. 
 
 ## Read in CSV from iNat (*Leptosiphon minimus*)
+
+We have downloaded 69 observations of *Leptosiphin minimus* (babystars) from iNaturalist as a CSV file (called `Lmini_iNat.csv`). This will be our raw data, and includes the following columns: the observation ID (`id`), the URL to the observation on iNaturalist.com (`url`), latitude/longitude for the observation location (`latitude` and `longitude`) and the scientific name.
 
 ```{r}
 #Read in CSV
@@ -102,6 +109,8 @@ names(LM)
 ------------------------------------------------------------------------
 
 ## Convert from Degrees to Meters, set up Pops
+
+In order to define populations, we will use a package called `dbscan` to group *L. minimus* observations into populations using a 1000-meter radius. Before we can do this, we must convert latitude/longitude degrees into meters.
 
 ```{r}
 #Convert to sf object
@@ -116,6 +125,8 @@ LM_coords <- st_coordinates(LM_utm)
 
 ## Run dbscan and add Pops column to CSV
 
+Now that we've converted latitude to meters, we can run `dbscan`. We will use `dbscan` to define populations as 4 or more observations within a 1000 m radius.
+
 ```{r}
 #Run DBSCAN, 1000 m radius populations with 4 or more observations per pop
 db <- dbscan(LM_coords, eps = 1000, minPts = 4)  
@@ -127,17 +138,9 @@ LM$population_id <- db$cluster
 
 ------------------------------------------------------------------------
 
-## Check if it worked
+## Save data frame with population ID
 
-```{r}
-table(LM$population_id)
-sum(LM$population_id == 0)
-
-```
-
-------------------------------------------------------------------------
-
-## Save CSV
+We will save the data frame with the new population ID column as a new CSV file called `LMini_iNat_Pops.csv`.
 
 ```{r}
 write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
@@ -147,40 +150,42 @@ write.csv(LM, "data/LMini_iNat_Pops.csv", row.names = FALSE)
 
 ## Visualize data
 
-We will use ggplot to make a bar plot of population sizes.
+Let's count how many observations are within each of populations 0-6.
 
 ### NOTE: All observations belonging to population '0' are singleton observations, that did not meet our population criteria (4 observations within 1000 m)
 
 ```{r}
-#List pop sizes
+# List pop sizes
 LM_pop_sizes <- LM %>%
   count(population_id, name = "n_obs") %>%
   arrange(desc(n_obs))
 
 LM_pop_sizes
 
-#Bar plot of pop sizes
+# Count up the total number of observations that are NOT in population "0"
+sum(LM$population_id == 0)
+
+# View a bar plot of population sizes
 ggplot(LM_pop_sizes, aes(x = factor(population_id), y = n_obs)) +
   geom_col() +
   labs(x = "Population ID",
        y = "Number of Observations",
        title = "L. minimus Observation Counts per Population") +
-  theme_minimal() +
+  theme_bw() +
   theme(axis.text.x = element_text(size = 5))
-
-
 ```
 
 ------------------------------------------------------------------------
 
 ## Visualize pops on a map
-We will use the sf package to visualize the proportion of pink to white flowers as pie charts on a map of our populations. 
+
+Let's visualize all observations on a map of the West Coast of North America, and color the points by population. Remember that population = 0 are singletons.
 
 ```{r}
 # Get world basemap
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
-# Bounding box around our data
+# Add a bounding box around our data
 bbox <- c(
   xmin = min(LM$longitude) - 0.5,
   xmax = max(LM$longitude) + 0.5,
@@ -199,12 +204,13 @@ ggplot() +
            ylim = c(bbox["ymin"], bbox["ymax"]),
            expand = FALSE) +
   labs(color = "Population") +
-  theme_minimal() +
+  theme_bw() +
   theme(axis.text.x = element_text(size = 5))
-
 ```
 
 ## Let's remove noise from 'pop 0' singleton observation
+
+Remove single observations by filtering for observations where population ID is *not* 0.
 
 ```{r}
 # Remove noise points (population_id == 0)
@@ -222,7 +228,7 @@ bbox <- c(
   ymax = max(LM_clean$latitude) + 0.5
 )
 
-#Plot cleaned data
+#Plot cleaned data on a new map
 ggplot() +
   geom_sf(data = world, fill = "gray95", color = "gray80") +
   geom_point(data = LM_clean,
@@ -240,7 +246,9 @@ ggplot() +
 
 ------------------------------------------------------------------------
 
-## Finish and Save
+## Save data frame with population ID + singletons removed
+
+We will save the data frame after filtering out singletons as new CSV file called `LMini_iNat_Pops_filtered.csv`.
 
 ```{r}
 # Save to new CSV
@@ -257,33 +265,38 @@ write.csv(LM_clean, "data/LMini_iNat_Pops_filtered.csv", row.names = FALSE)
 
 Now that we have our data set, we need to mark our iNaturalist observations based on flower color.
 
-## Let's make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_curated.csv, and add some new columns: **polymorphic** and **color**
+## Let's make a copy of LMini_iNat_Pops_filtered.csv called LMini_iNat_Pops_filtered_curated.csv, and add some new columns: **`polymorphic`** and **`color1`** and **`color2`**.
 
 ```{r}
-# Read in the csv file from Step 1
-LMini_pops_fil <- read.csv("LMini_iNat_Pops_filtered.csv", header = TRUE)
+# Import filtered data frame from last step
+LMini_iNat_Pops_filtered = read.csv("data/LMini_iNat_Pops_filtered.csv")
 
-# Let's create new blank columns called polymorphic and color
-# Set it to NA for numerical/logical data
-LMini_pops_fil$polymorphic <- NA
-LMini_pops_fil$color <- NA
+# Add polymorphic, color1, and color2 columns
+LMini_iNat_Pops_filtered_curated <- LMini_iNat_Pops_filtered %>%
+  mutate(
+    polymorphic = NA, # Set to NA to start
+    color1 = NA_character_,
+    color2 = NA_character_
+  )
 
-# Save the CSV
-write.csv(LMini_pops_fil, "LMini_iNat_Pops_filtered_curated.csv", row.names = FALSE)
+# Export the CSV file - important, because next step is done manually!
+write.csv(LMini_iNat_Pops_filtered_curated,
+          "data/LMini_iNat_Pops_filtered_curated.csv",
+          row.names = FALSE)
 ```
 ------------------------------------------------------------------------
 
 ## Identify color and degree of polymorphism for each iNaturalist Observation
 
-Next, we will go through each iNaturalist observation in our LMini_iNat_Pops_filtered_curated.csv by clicking the hyperlink in each respective row.
+Next, we will go through each iNaturalist observation in our LMini_iNat_Pops_filtered_curated.csv by clicking the hyperlink in each respective row. Then we will [manually]{.underline} note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.** If the observation is polymorphic, it's second color will be put into the color2 column.
 
-Then, we will note the flower color in the observation's photo, choosing **pink** or **white**, and writing that down in the cell of the color column for each respective row. However, if the observation has no flowers or all flowers are still closed, we will instead write **closed** in that cell instead. Additionally, we will mark whether the observation show more than one flower color in the polymorphic column. This will be a binary variable, with **polymorphic observations receiving a 1** and **monomorphic observations receiving a 0.**
-
-Once the **polymorphic** and **color** columns are filled out we can move on to the next step. Make sure to save it to the same CSV ```LMini_iNat_Pops_filtered_curated.csv```after editing.
+Once the **`polymorphic`** and **`color`** columns are filled out we can move on to the next step; lets save the new file as **`LMini_iNat_Pops_filtered_curated_color.csv`** Make sure to save it as a CSV after editing.
 
 ------------------------------------------------------------------------
 
 ## Filtering out closed flowers
+
+Read in the CSV from the last step, and filter out the closed flowers.
 
 ```{r}
 #Read in curated CSV 
@@ -312,6 +325,8 @@ LMCF_clean <- LMCF %>%
 
 ## Group colors by population
 
+To summarize the proportion of flowers in each population that are pink vs. white, we will summarise each population into a single point by averaging the latitude and longitude. We will make a new data frame `pop_pies` that summarizes the average latitude/longitude, the number of white flowers, the number of pink flowers, and the number of total flowers per population.
+
 ```{r}
 #Grouping colors by population for pie charts
 pop_pies <- LMCF_clean %>%
@@ -329,6 +344,8 @@ pop_pies <- LMCF_clean %>%
 ------------------------------------------------------------------------
 
 ## Mapping populations as pie charts
+
+Let's make a new map that shows a small pie chart for each population, using the average lat/long for each as its markers, and denoting the proportion of all flowers that are pink vs. white.
 
 ```{r}
 # World basemap
@@ -374,13 +391,12 @@ In order to calculate the distance of each observation from the water (i.e., to 
 **Note: This only works for observations in the US, so we had to manually calculate the distance from shore for the Canadian observations (population 1) using the app Avenza. For each of the Canadian observations, we measured the minimum distance from shore using the Draw and Measure Tool.**
 
 ```{r}
-
 # Import shape file of Western US shoreline
 shoreline <- st_read("data/West/West.shp")
 
-# To view the imported shape file
-tmap_mode("view")  # interactive mode
-tm_shape(shoreline) + tm_lines()
+# To view the imported shape file - Requires HTML output for saving; commented out for now
+#tmap_mode("view")  # interactive mode
+#tm_shape(shoreline) + tm_lines()
 
 # Import coordinate data for observations
 points_sf <- st_as_sf(LMCF_clean,
@@ -404,13 +420,21 @@ LMCF_clean <- LMCF_clean %>%
   mutate(color_binom = case_when(
     color == "pink"  ~ 1,
     color == "white" ~ 0,
-TRUE ~ NA_real_
+    TRUE ~ NA_real_
   ))
 
+# Check headers for data frame
+str(LMCF_clean)
+```
+
+## Let's export the dataframe
+
+We will export the data frame after calculating the distance from shore for each observation as `LMCF_clean_dist.csv`.
+
+```
 # Write to csv
 write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
 ```
-  
 </p>
 </details>
 
@@ -420,55 +444,174 @@ write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
 
 Since we are interested in if shoreline distance predicts the outcome of flower color (pink or white), we will be using a Bernoulli distribution to model our data. We will use individual populations (i.e., 1, 2, 3, 4, 5, 6) as a random effect since it will contribute to clustering in our data. We will be using the brm() within the ```brms``` R package for our model. 
 
-<details><summary>0. Making a ggplot for Our Potential Model </summary>
+<details><summary>0. Making a simple plot for Our Potential Model </summary>
 <p> 
 
-```{r}
-# Change color to a factor - will default 
-#LCMF_clean$color <- as.factor(LCMF_clean$color$)
+To quickly assess how probability of being pink might change with distance from shore, let's create a simple scatter plot of color vs. distance (in meters).
 
-# Plot 
+```{r}
+# Plot distance from shore vs. color
 ggplot(data=LMCF_clean, aes(x=dist_m, y=color)) +
   geom_point() +
-  theme_bw()
-
+  theme_bw() +
+  labs(x = "Distance from shore (m)",
+       y = "Color")
 ```
 </p>
 </details>
 
-<details><summary>1.  Running and Assessing the Model using brms() </summary>
+<details><summary>1.  Run prior predictive simulations </summary>
 <p> 
+
+In this section, we will define our priors and explore what they look like in simulations.
+
+For our standard deviation, we will set our prior as exponential(1). This will make our standard deviation always positive and centreed near 0.
+
+For our slope, we will set it as normal(0, 0.5). Our slope is how much the log-odds of being pink changes for every one unit increase in distance to shore. The 0 means we start with no prior expectation of a relationship, and the 0.5 means we're skeptical of very large effects.
+
+Finally, for our intercept, we will set it as normal(0,1). The intercept is the baseline log-odds of a flower being pink when distance to shore is zero. The 0 means we expect the baseline probability to be centered around 50/50 (since plogis(0) = 0.5). The 1 means we allow moderate uncertainty around that, letting the baseline probability range roughly between \~18% and \~82% (plogis(-1) to plogis(1)).
+
+```
+# Define priors
+priors <- c(
+  set_prior("normal(0, 1)", class = "Intercept"),        # prior for alpha (intercept)
+  set_prior("normal(0, .5)", class = "b", coef = "dist_m"), # prior for beta (slope)
+  set_prior("exponential(1)", class = "sd")                 # prior for random effect SD
+)
+
+# Run prior simulations
+n <- 1000
+
+priorsims <- tibble(
+    group = seq_len(n),
+    alpha = rnorm(n, 0, 1),   # prior for intercept (log-odds scale)
+    beta  = rnorm(n, 0, .5)      # prior for slope (effect of distance)
+  ) %>%
+  expand(
+    nesting(group, alpha, beta),
+    dist_scaled = seq(from = -2, to = 2, length.out = 100)  # range of (scaled) distance
+  ) %>%
+  mutate(
+    log_odds = alpha + beta * dist_scaled,   # linear predictor (log-odds)
+    prob      = plogis(log_odds)             # convert to probability via inverse logit
+  )
+
+# Plot prior predictive lines
+ggplot(priorsims,
+       aes(x = dist_scaled,
+           y = prob,
+           group = group)) +
+  geom_line(alpha = 0.05) +
+  labs(
+    title = "Prior Predictive Lines (Bernoulli logit)",
+    x     = "Distance to Shore (centered & scaled)",
+    y     = "P(pink flower)"
+  )
+```
+
+</p>
+</details>
+
+<details><summary>2.  Running the Model using brms() with our priors </summary>
+<p> 
+
+We will fit a GLMM model to ask whether the probability of being pink changes with distance to shore, specifically using a logistic mixed effects model. Because the response variable (i.e., chance of being pink, where pink = 1 and white = 0) is binary, we will fit a Bernoulli distribution with a logit link. So, we are modeling the log-odds of being pink (i.e., `color_binom` = 1). We are modeling whether distance predicts the probability of being pink, with the population as a random effect.
 
 ```
 # Run the model
 m.dist.color.pop <-
   brm(data = LMCF_clean, # Give the model the data
-      # Use a binomial distribution
+      # Use a bernoulli distribution
       family = bernoulli(link = "logit"),
       # Specify the model 
-      color_binom ~ 1 + dist_m + (1|population_id),
+      color_binom ~ 1 + dist_m + (1|population_id), # Add population as a random effect
+      # Set priors 
+      prior = priors, 
+      sample_prior = TRUE,
       iter = 2000, warmup = 1000, chains = 4, cores = 4,
       file = "output/m.dist.color.pop")
-
-print(m.dist.color.pop, digits = 3)
-plot(m.dist.color.pop)
 ```
 </p>
 </details>
 
-<details><summary>2.  Estimate and visualize the probability that pink increases closer to shore </summary>
+<details><summary>3.  Assessing the Model </summary>
 <p> 
 
-```{r}
+Let's run `summary()`, `print()`, and `plot()` on our model output to assess how well it ran!
+
+```
+summary(m.dist.color.pop)
+print(m.dist.color.pop, digits = 3)
+plot(m.dist.color.pop)
+```
+The model seems to have converged correctly! Our Rhat is equal to 1. The MCMC chains are overlapping and flat, and the posterior distributions are smooth and have one clean peak.
+
+**For every 1 meter increase in distance to shore, the log-odds of being pink increases by 0.003**. However, we cannot confidently state that the effect size is different from 0 because our 95% lower and upper compatibility intervals intersect 0 (-0.001 - 0.010).
+
+</p>
+</details>
+
+<details><summary>4.  Estimate the proportion our posterior slope is larger than zero </summary>
+<p> 
+In this section, we will use the `as_draws_df()` to extract the posterior distribution samples from our fitted `brms` model into a data frame. Then, we will calculate a proportion of how many our sampled values of our slope are positive.
+
+```
 #  Extract all posteriors from 4 MCMC chains into a table
 draws <- as_draws_df(m.dist.color.pop) 
 
 # What proportion of posteriors have estimate for slope > 0?
 sum(draws$b_dist_m>0)/length(draws$b_dist_m) 
 
+```
+We have a value of .858, which means that **85.8% of the posterior distribution for the slope is above zero.** This means that there is an 85.8% probability that distance to shore has a positive effect on pink flower color. In other words, flowers are more likely to be pink as distance from shore increases.
+
+</p>
+</details>
+
+<details><summary>5.  Plot predicted response </summary>
+<p> 
+
+```{r}
 # Plot predicted response
-preds <- predict_response(m.dist.color.pop)
+preds <- predict_response(m.dist.color.pop,
+                          bias_correction = TRUE)
 plot(preds)
 ```
+------------------------------------------------------------------------
+
+## Overlay empirical binned proportions on top of model
+
+To better illustrate the trend, we will overlay the empirical data on top of the model predictions in the `predict_response` plot. We will:
+
+1.  Bin distance to shore into 250m bins
+2.  Calculate the observe proportion of flowers that are pink
+3.  Add those points to the prediction plot
+
+```
+# Bin observations into 100m bins
+LMCF_binned <- LMCF_clean %>%
+  mutate(dist_bin = floor(dist_m / 100) * 100)
+
+# Calculate observed proportions of pink in each
+obs_summary <- LMCF_binned %>%
+  group_by(dist_bin) %>%
+  summarise(
+    mean_prob = mean(color_binom),
+    n = n()
+  ) %>%
+  ungroup()
+
+# Center points on the bin
+obs_summary <- obs_summary %>%
+  mutate(dist_mid = dist_bin + 50)
+
+p <- plot(preds) # Call predict_response plot
+p + # Add binned points
+ geom_point(data = obs_summary,
+             aes(x = dist_mid, y = mean_prob),
+             size = 3,
+             color = "black")
+```
+
 </p>
 </details>
