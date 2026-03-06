@@ -1,5 +1,5 @@
 ---
-title: "Babystars and soil salinity"
+title: "Babystars and Soil Salinity"
 format: pdf
 
 execute:
@@ -167,7 +167,7 @@ ggplot() +
 
 ```
 
-## Lets remove noise from 'pop 0' singleton observation
+## Let's remove noise from 'pop 0' singleton observation
 
 Remove single observations by filtering for observations where population ID is *not* 0.
 
