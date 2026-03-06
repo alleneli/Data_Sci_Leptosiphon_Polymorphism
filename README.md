@@ -171,9 +171,12 @@ ggplot(LM_pop_sizes, aes(x = factor(population_id), y = n_obs)) +
   labs(x = "Population ID",
        y = "Number of Observations",
        title = "L. minimus Observation Counts per Population") +
+
   theme_bw() +
   theme(axis.text.x = element_text(size = 5))
+
 ```
+<img width="586" height="351" alt="Plot1_Lminimuspopcounts" src="https://github.com/user-attachments/assets/0b53da9d-1a23-4c21-9007-7cd42517cfa3" />
 
 ------------------------------------------------------------------------
 
@@ -207,6 +210,9 @@ ggplot() +
   theme_bw() +
   theme(axis.text.x = element_text(size = 5))
 ```
+<img width="387" height="452" alt="Plot2_mapofpopulations" src="https://github.com/user-attachments/assets/4e6872d1-31c0-4402-9494-7ae6ee6f7bc2" />
+
+
 
 ## Let's remove noise from 'pop 0' singleton observation
 
