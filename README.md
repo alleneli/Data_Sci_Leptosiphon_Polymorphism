@@ -444,7 +444,7 @@ write.csv(LMCF_clean,"data/LMCF_clean_dist.csv", row.names = FALSE)
 
 Since we are interested in if shoreline distance predicts the outcome of flower color (pink or white), we will be using a Bernoulli distribution to model our data. We will use individual populations (i.e., 1, 2, 3, 4, 5, 6) as a random effect since it will contribute to clustering in our data. We will be using the brm() within the ```brms``` R package for our model. 
 
-<details><summary>0. Making a simple plot for Our Potential Model </summary>
+<details><summary>0. Making a simple plot for our potential model </summary>
 <p> 
 
 To quickly assess how probability of being pink might change with distance from shore, let's create a simple scatter plot of color vs. distance (in meters).
